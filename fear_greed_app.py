@@ -285,3 +285,4 @@ with st.expander("📖 오실레이터 해석 가이드"):
     """)
 
 st.caption(f"마지막 업데이트: {last_date} | 데이터: Yahoo Finance | 새로고침하면 최신 데이터 반영")
+
