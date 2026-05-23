@@ -196,21 +196,70 @@ def signal(osc):
 def make_chart(df, idx_label, idx_color, months):
     cut = df.index.max() - pd.DateOffset(months=months)
     v   = df[df.index >= cut]
-    OSC_COL = "#6a5acd"
+    OSC_COL  = "#6a5acd"
+    last_dt  = v.index[-1]
+    last_osc = float(v["Oscillator"].iloc[-1])
+    last_idx = float(v["IDX"].iloc[-1])
+    last_str = last_dt.strftime("%Y-%m-%d")
+
     fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # 오실레이터 라인
     fig.add_trace(go.Scatter(x=v.index, y=v["Oscillator"], name="Oscillator",
         line=dict(color=OSC_COL, width=2),
         hovertemplate="%{x|%Y-%m-%d}<br>Osc: %{y:.4f}<extra></extra>"),
         secondary_y=False)
+
+    # 지수 라인
     fig.add_trace(go.Scatter(x=v.index, y=v["IDX"], name=idx_label,
         line=dict(color=idx_color, width=1.8),
         hovertemplate=f"%{{x|%Y-%m-%d}}<br>{idx_label}: %{{y:,.2f}}<extra></extra>"),
         secondary_y=True)
+
+    # 제로라인
     fig.add_hline(y=0, line_dash="dot",
                   line_color="rgba(200,200,200,0.35)", line_width=1)
+
+    # ── 최신 날짜 수직선 ─────────────────────────────────────
+    fig.add_vline(x=last_dt, line_dash="dash",
+                  line_color="rgba(255,255,255,0.4)", line_width=1)
+
+    # 최신 오실레이터 값 마커 + 라벨
+    fig.add_trace(go.Scatter(
+        x=[last_dt], y=[last_osc],
+        mode="markers+text",
+        marker=dict(color=OSC_COL, size=8, symbol="circle"),
+        text=[f"  {last_osc:+.4f}"],
+        textposition="middle right",
+        textfont=dict(color=OSC_COL, size=11),
+        showlegend=False,
+        hovertemplate=f"{last_str}<br>Osc: {last_osc:.4f}<extra>최신</extra>"),
+        secondary_y=False)
+
+    # 최신 지수 값 마커 + 라벨
+    fig.add_trace(go.Scatter(
+        x=[last_dt], y=[last_idx],
+        mode="markers+text",
+        marker=dict(color=idx_color, size=8, symbol="circle"),
+        text=[f"  {last_idx:,.0f}"],
+        textposition="middle right",
+        textfont=dict(color=idx_color, size=11),
+        showlegend=False,
+        hovertemplate=f"{last_str}<br>{idx_label}: {last_idx:,.2f}<extra>최신</extra>"),
+        secondary_y=True)
+
+    # 최신 날짜 텍스트 (상단)
+    fig.add_annotation(
+        x=last_dt, y=1, yref="paper",
+        text=f"<b>{last_str}</b>",
+        showarrow=False,
+        xanchor="right", yanchor="bottom",
+        font=dict(color="rgba(255,255,255,0.7)", size=10),
+        bgcolor="rgba(0,0,0,0)")
+
     fig.update_layout(hovermode="x unified",
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        height=370, margin=dict(l=0,r=0,t=35,b=20),
+        height=390, margin=dict(l=0,r=60,t=35,b=20),
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(20,20,35,0.9)")
