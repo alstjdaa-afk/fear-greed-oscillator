@@ -6,3 +6,4 @@ scikit-learn>=1.4.0
 plotly>=5.22.0
 finance-datareader>=0.9.50
 pykrx>=1.0.45
+setuptools>=70.0.0
