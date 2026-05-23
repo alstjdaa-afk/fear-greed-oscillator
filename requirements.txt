@@ -4,3 +4,5 @@ pandas>=2.0.0
 numpy>=1.26.0
 scikit-learn>=1.4.0
 plotly>=5.22.0
+finance-datareader>=0.9.50
+pykrx>=1.0.45
